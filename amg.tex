@@ -1,0 +1,187 @@
+\section{Angular multigrid}
+\subsection{Equation} 
+The equation that we want to solve is the Boltzmann equation :
+\begin{equation}
+\bo \cdot \bn \Psi(\br,\bo,E) + \Sigma_t(\br,\bo,E) \Psi(\br,\bo,E) =
+\int_{4\pi}\!\!\int_{0}^{\infty}\Sigma_s(\br,\bo\cdot\bo',E'\rightarrow
+E)\Psi(\br,\bo',E')\ dE'd\bo'+Q(\br,\bo,E) 
+\label{transport}
+\end{equation}
+where :
+\begin{itemize}
+\item $\Psi$ is the angular flux.
+\item $\Sigma_t$ is the total macroscopic cross section.
+\item $\Sigma_s$ is the macroscopic differential scattering cross section.
+\item $Q$ is a volumetric source.
+\item $\br$ is the position.
+\item $E$ is the energy.
+\item $\bo = (\mu,\phi)$.
+\item $\mu$ is the cosine pf the directional polar angle.
+\item $\phi$ is the directional azimuthal angle.
+\end{itemize}
+Now, we discretize this equation in energy using the standard multigroup
+method \cite{reuss} and in angle using the discrete ordinate method
+\cite{reuss} :
+\begin{equation}
+\bo_d \cdot \bn \Psi_d^g(\br) + \Sigma_{t,g}^g(\br) \Psi_d^g(\br) = \sum_{g'=0}^G
+\sum_{l=0}^L\sum_{m=-l}^l \frac{2l+1}{4\pi}\Sigma_{s,l}^{g'\rightarrow
+g}\Phi_{l,m}^{g'}(\br)Y_l^m(\bo_d) + Q_d^g(\br)
+\label{discretized}
+\end{equation}
+where :
+\begin{itemize}
+\item $\Psi_d^g(\br)=\int_{E^{g}}^{E^{g-1}}\Psi(\br,\bo_d,E)\ dE$.
+\item $\Sigma_{t,d}^g(\br) = \frac{\int_{E^{g}}^{E^{g-1}}\Sigma_t(\br,\bo_d,E)
+\Psi(\br,\bo_d,E) dE}{\int_{E^g}^{E^{g-1}}\Psi(\br,\bo_d,E) dE}$.
+\item $\Sigma_{s,l}$ is the Legendre moment of degree $l$ of $\Sigma_s$.
+\item $Q_d^g(\br) = \int_{E^g}^{E^{g-1}}Q(\br,\bo_d,E) dE$.
+\item $\bo_d = (\mu_d,\phi_d)$.
+\item $Y_l^m$ are the spherical harmonics.
+\item $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)Y_l^{m,*}(\bo)\ d\bo$.
+\end{itemize}
+This equation still needs to be discretized in space. We used linear
+discontinuous finite elements but other methods could be used. Equation
+(\ref{discretized}) can be written as :
+\begin{equation}
+L \bs{\Psi} = M\Sigma D \bs{\Psi} + \bs{Q}
+\label{operator}
+\end{equation}
+where :
+\begin{itemize}
+\item $L = \bo\cdot \bullet + \Sigma_t \bullet$
+\item $\bs{\Psi}$ is a vector containing all the $\Psi_d$.
+\item $\bs{Q}$ is a vector containing all the $Q_d$.
+\item $\Sigma$ is a diagonal matrix with the element $\Sigma_{s,l}$ as
+diagonal elements.
+\item $M$ is the moment-to-direction matrix ($\bs{\Psi}=M\bs{\Phi}$).
+\item $D$ is the direction-to-moment matrix ($\bs{\Phi}=D\bs{\Psi}$).
+\end{itemize}
+Equation (\ref{operator}) can be solved using the Source Iteration method or
+Krylov Solver.\\
+The Source Iteration (SI) method can be written as follows :
+\begin{equation}
+L\bs{\Psi}^k = M\Sigma D \bs{\Psi}^{k-1} + \bs{Q}
+\end{equation}
+The spectral radius of SI can become arbitrary close to one in diffusive
+medium. The most common method to accelerate the convergence is to use the
+Diffusion Synthetic Acceleration \cite{adams}. The SI+DSA scheme is given by :
+\begin{align}
+&\bs{\Phi}^{k+1/2} = DL^{-1}M\Sigma\bs{\Phi}^k + DL^{-1}Q\\
+&\delta\bs{\Phi}^k = A \(\bs{\Phi}^{k+1/2}-\bs{\Phi}^k\)\\
+&\bs{\Phi}^{k+1} = \bs{\Phi^{k+1/2}} + \delta \bs{\Phi}^k
+\end{align}
+where $A$ is the DSA operator.\\
+When using a Krylov solver equation (\ref{operator}) can be rewritten as :
+\begin{equation}
+(I-DL^{-1}M\Sigma) \bs{\Phi} = DL^{-1}\bs{Q}
+\label{krylov}
+\end{equation}
+where $I$ is the identity matrix. DSA can also help to speed up the
+convergence of the Krylov solver. First we need to rewrite the accelerated
+scheme :
+\begin{align}
+&\bs{\Phi}^{k+1} = \bs{\Phi}^{k}+\delta\bs{\Phi}^{k}\\
+&\bs{\Phi}^{k+1} = DL^{-1}M\Sigma\bs{\Phi}^k+DL^{-1}\bs{Q}+A(\bs{\Phi}^{k+1/2}
+-\bs{\Phi}^k)\\
+&\bs{\Phi}^{k+1} = DL^{-1}M\Sigma\bs{\Phi}^k+DL^{-1}\bs{Q}+A(DL^{-1}M\Sigma
+\bs{\Phi}^k+DL^{-1}\bs{Q}-\bs{\Phi}^{k})\\
+&\bs{\Phi}^{k+1} = \((I+A)DL^{-1}M\Sigma-A\)\bs{\Phi}^k + (I+A)DL^{-1} Q
+\end{align}
+Thus, the equation that we need to solve with the Krylov solver is :
+\begin{equation}
+\((I+A)(I-DL^{-1}M\Sigma)\)\bs{\Phi} = (I+A)DL^{-1}Q
+\end{equation}       
+\subsection{Previous work}
+DSA uses a diffusion equation to speed up the convergence. Because of this,
+only the scalar flux and the current can be accelerated. This is a problem if
+the scattering is highly anisotropic like for charged particles transport and
+therefore others method have to be used \cite{kassem,multigrid_1d}. Morel and
+Manteuffel have proposed an angular multigrid method to accelerate the SI
+calculation of the one dimension within-group $S_n$ equations when the scattering 
+is highly anisotropic \cite{multigrid_1d}. If we define :
+\begin{equation}
+Half(n) = \left\{
+\begin{aligned}
+&\frac{n}{2}, &\textrm{if $\frac{n}{2}$ is even}\\
+&\frac{n}{2}+1, &\textrm{if $\frac{n}{2}$ is odd}
+\end{aligned}
+\right.
+\end{equation}
+The scheme works as follows : 
+\begin{enumerate}
+\item Perform a transport sweep for the $S_n$ equations.
+\item Perform a transport sweep for the $S_{n_2}$ equations with a $P_{n_2-1}$
+expansions using the $S_n$ residual as the inhomogeneous source, where
+$n_2=Half(n)$.
+\item Continue coarsening the angular grid by a factor 2 (i.e., according to
+the definition of ``$Half$'') until a sweep has been performed for the $S_4$
+equations.
+\item Solve the diffusion equation with a $P_1$ expansion for the $S_4$
+residual as the inhomogeneous source.
+\item Add the Legendre moments of the diffusion solution to the Legendre
+moments of the $S_4$ iterate to obtain the accelerated $S_4$ iterate.
+\item Continue to add the corrections from each coarse grid to the finer grid
+above to obtain the accelerated $S_n$ moments.
+\end{enumerate}
+Every time a transport sweep is performed, the optimal transport correction
+needs to be used \cite{multigrid_1d}. For a $P_{n-1}$ expansion of the cross
+sections, the corrected cross sections are given by :
+\begin{equation}
+\Sigma^* = \Sigma -\frac{\Sigma_{s,n/2}+\Sigma_{s,n-1}}{2}
+\end{equation}
+This correction is optimal because it minimizes the ``high-frequency'' angular
+errors and because for an infinite homogeneous medium, the smoothing factor is
+given by :
+\begin{equation}
+\rho_s =
+\max(|\Sigma_{s,n/2}|/\Sigma_{s,0},|\Sigma_{s,n/2+1}|/\Sigma_{s,0},\hdots,
+|\Sigma_{s,n-1}|/\Sigma_{s,0})
+\end{equation}
+This scheme is very efficient in one dimension and it has been adapted to
+multidimensional problem \cite{multigrid_2d}. In the multidimensional case,
+the DSA becomes unstable when $\frac{\Sigma_{s,1}}{\Sigma_{t}}\geq 0.5$ if the
+current accelerated \cite{multisweep}. Therefore, the angular multigrid method
+was modified as follows \cite{multigrid_2d} :
+\begin{enumerate}
+\item Perform a transport sweep for the $S_n$ equations.
+\item Perform a transport sweep for the $S_{n_2}$ equations with a $P_{n_2}$
+for 2-D problem and a $P_{n_2}+1$ for 3-D problem expansion for the $S_n$
+residual as the inhomogeneous source, where $n_2=Half(n)$.
+\item Continue coarsening the angular grid by a factor (i.e., according to the
+definition of ``$Half$'') until a sweep has been performed for the $S_2$
+equations.
+\item Solve the diffusion equation with a $P_0$ expansion for the $S_2$
+residual as the inhomogeneous source. 
+\item Apply a diffusive filter to the corrections from step 2 and 3. Without a
+filter, the method is unstable.
+\item Add the corrections from steps 4 and 5 to the Legendre moments of the
+$S_n$ iterate to obtain the accelerated $S_n$ moments.
+\end{enumerate}
+The filter stabilizes the method which otherwise would diverge but it reduces
+the efficiency of the angular multigrid and the spectral radius can become
+close to one when $n$, and, therefore, $L$ becomes large.
+\subsection{Angular multigrid with Krylov solver}
+In this paper, we propose to abandon the SI method and to use the angular
+multigrid as a preconditioner for the Krylov solver. The successive sweeps are
+now different stages of a preconditioner. Using a method similar to the one
+we used to write the equation for the preconditioned Krylov solver, we get :
+\begin{equation}
+(I+P_{\frac{n}{2}\rightarrow n }
+T_{\frac{n}{2}} (I+P_{\frac{n}{4}\rightarrow\frac{n}{2}}T_{\frac{n}{4}} (\hdots
+(I+P_{0\rightarrow 2} \mathcal{T}_0 R_{2\rightarrow 0})\hdots)
+R_{\frac{n}{2}\rightarrow \frac{n}{4}})R_{n\rightarrow\frac{n}{2}})(I-T_n)
+\bs{\Phi}_n = D_n L_n^{-1} \bs{\Phi}_n
+\end{equation}  
+where :
+\begin{itemize}
+\item $T_n = D_n L_n^{-1}M_n \Sigma_n$, the subscript $n$ is there to remind
+that we are solving the $S_n$ equations.
+\item $\mathcal{T}_0$ is the DSA operator.
+\item $P_{\frac{n}{2}\rightarrow n}$ is the projection matrix of
+$\bs{\Phi}_{\frac{n}{2}}$ to $\bs{\Phi}_n$.
+\item $R_{n\rightarrow \frac{n}{2}}$ is the restriction matrix of
+$\bs{\Phi}_{\frac{n}{2}}$ to $\bs{\Phi}_n$.
+\end{itemize}
+In this paper, we will use the Modified Interior Penalty (MIP) DSA \cite{mip}
+that has been derived from the discretized transport equations using linear
+discontinuous finite elements.
