@@ -53,8 +53,8 @@ where :
 \item $\bs{Q}$ is a vector containing all the $Q_d$.
 \item $\Sigma$ is a diagonal matrix with the element $\Sigma_{s,l}$ as
 diagonal elements.
-\item $M$ is the moment-to-direction matrix ($\bs{\Psi}=M\bs{\Phi}$).
-\item $D$ is the direction-to-moment matrix ($\bs{\Phi}=D\bs{\Psi}$).
+\item $M$ is the moment-to-discrete matrix ($\bs{\Psi}=M\bs{\Phi}$).
+\item $D$ is the discrete-to-moment matrix ($\bs{\Phi}=D\bs{\Psi}$).
 \end{itemize}
 Equation (\ref{operator}) can be solved using the Source Iteration method or
 Krylov Solver.\\
@@ -137,11 +137,27 @@ given by :
 \max(|\Sigma_{s,n/2}|/\Sigma_{s,0},|\Sigma_{s,n/2+1}|/\Sigma_{s,0},\hdots,
 |\Sigma_{s,n-1}|/\Sigma_{s,0})
 \end{equation}
-This scheme is very efficient in one dimension and it has been adapted to
-multidimensional problem \cite{multigrid_2d}. In the multidimensional case,
-the DSA becomes unstable when $\frac{\Sigma_{s,1}}{\Sigma_{t}}\geq 0.5$ if the
-current accelerated \cite{multisweep}. Therefore, the angular multigrid method
-was modified as follows \cite{multigrid_2d} :
+One way to approximate the electron scattering cross section is to use the
+Fokker-Planck scattering sections :
+\begin{equation}
+\Sigma_{s,l} = \frac{\alpha}{2} (L(L+1)-l(l+1))\ \ \ l=0,\hdots,L
+\end{equation}
+where $\alpha$ is the momentum transfer \cite{morel_81}. In one dimension,
+DSA/P1SA become less efficient as $\Sigma_{s,l}$ $(l>0)$ becomes closer to
+$\Sigma_{s,0}$ with increasing anisotropy order L. In the limit as
+$L\rightarrow \infty$ becomes closer to $\Sigma_{s,0}$ with increasing
+anisotropy order $L$. In the limit as $L\rightarrow \infty$, DSA/P1SA no
+longer accelerate the convergence (the spectral radius tends to 1.0 and thus,
+the acceleration scheme is inefficient).  However, the spectral radius of the
+angular multigrid method has an upper bound of 0.6 when $L$ goes to infinity.
+In the multidimensional case, DSA/P1SA become unstable when both the zeroth
+and the first flux moments are accelerated and $\frac{\Sigma_{s,1}}{\Sigma_t}
+\geq 0.5$ \cite{multisweep}. In \cite{multigrid_2d}, the authors modified the
+one dimensional angular multigrid method by accelerating only the zeroth flux
+moments with the DSA but to compensate for the loss of a more effective DSA,
+the lowest transport sweep is an $S_2$ sweep instead of an $S_4$. Moreover, a
+filter is now needed to stabilize the method. Therefore, the angular multigrid 
+method was modified as follows \cite{multigrid_2d} :
 \begin{enumerate}
 \item Perform a transport sweep for the $S_n$ equations.
 \item Perform a transport sweep for the $S_{n_2}$ equations with a $P_{n_2}$
@@ -164,13 +180,63 @@ close to one when $n$, and, therefore, $L$ becomes large.
 In this paper, we propose to abandon the SI method and to use the angular
 multigrid as a preconditioner for the Krylov solver. The successive sweeps are
 now different stages of a preconditioner. Using a method similar to the one
-we used to write the equation for the preconditioned Krylov solver, we get :
+we used to write the equation for the preconditioned Krylov solver, we get
+\hbox{successively :}
+\begin{align}
+& \Phi_n^{(l+1/2)} = D_n L_n^{-1} M_n \Sigma_n \Phi_n^{(l)} + D_n L_n^{-1} Q\\
+& \delta \Phi_{n/2}^{(l)} = D_{n/2} L_{n/2}^{-1} M_{n/2} \Sigma_{n/2}
+R_{n\rightarrow n/2} \(\Phi_n^{(l+1/2)}-\Phi_n^{(l)}\)\\
+& \hdots\\
+& \delta \Phi_2^{(l)} = D_2 L_2^{-1} M_2 \Sigma_2 R_{4\rightarrow 2} \delta \Phi_4\\
+& \delta \Phi_0^{(l)} = \mathcal{T}_0^{-1} \delta \Phi_2^{(l)} \\
+& \Phi_n^{(l+1)} = \Phi_n^{(l+1/2)} + P_{n/2 \rightarrow n} \delta
+\Phi_{n/2}^{(l)} + \hdots + P_{2 \rightarrow n} \delta \Phi_{2}^{(l)} + P_{0
+\rightarrow n} \delta \Phi_{0}^{(l)}
+\end{align}
+
 \begin{equation}
-(I+P_{\frac{n}{2}\rightarrow n }
+\begin{split}
+\Phi_n^{(l+1)} =& T_n \Phi_n^{(l)} + D_n L_n^{-1} Q +
+P_{n/2 \rightarrow n} \(T_{n/2}
+R_{n\rightarrow n/2} \(\Phi_n^{(l+1/2)} - \Phi_n^{(l)}\)\)+\hdots \\
+&+ P_{2 \rightarrow n} T_2 R_{4\rightarrow 2} \delta
+\Phi_{4}  + P_{0\rightarrow n} \mathcal{T}_0^{-1} \delta \Phi_2^{(l)}\\
+=& T_n \Phi_n^{(l)} + D_n L_n^{-1} Q + P_{n/2 \rightarrow
+n} \(T_{n/2} R_{n \rightarrow n/2}\(T_n \Phi_n^{(l)} +D_n L_n^{-1} Q -\Phi_n^{(l)}
+\)\)\\
+& +\hdots + P_{2\rightarrow n} T_2 R_{4\rightarrow 2} 
+\(T_4 R_{8\rightarrow 4}\( \hdots \(T_n \Phi_n^{(l)} + D_n L_n^{-1} Q -
+ \Phi_n^{(l)}\)\) \) \\ 
+&+ P_{0\rightarrow n} \mathcal{T}_0^{-1} R_{2\rightarrow 0}\(T_2 R_{4\rightarrow 2} 
+\(\hdots\(T_n \Phi_n^{(l)}+D_n L_n^{-1}Q-\Phi_n^{(l)}\)\)\)\\
+=& \(T_n + P_{n/2\rightarrow n} T_{n/2} R_{n\rightarrow n/2}\(T_n-I\)+
+ \hdots + P_{2\rightarrow n} T_2 R_{4\rightarrow}
+\(T_4 R_{8\rightarrow 4} \(\hdots\(T_n -I\)\)\)\right.\\ 
+&\left. +P_{0\rightarrow n} \mathcal{T}_0 R_{2\rightarrow 0}  \(T_2
+R_{4\rightarrow 2} (\hdots \(T_n-I\))\)\) \Phi_n^{(l)}
++\(I+P_{n/2\rightarrow n} T_{n/2} R_{n\rightarrow
+n/2}+ \hdots + \right.\\
+&\left. P_{2\rightarrow n} T_2 R_{4\rightarrow 2} \(T_4
+ R_{8\rightarrow 4}\(\hdots
+\(T_{n/2}R_{n\rightarrow n/2}\)\)\)+\right.\\
+& \left. P_{0\rightarrow n} \mathcal{T}_0^{-1}R_{2\rightarrow 0}
+\(T_2 R_{4\rightarrow 2}\(\hdots\(T_{n/2}R_{n\rightarrow n/2}\)\)\)\)
+D_nL_n^{-1} Q
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&(I+P_{\frac{n}{2}\rightarrow n }
 T_{\frac{n}{2}} (I+P_{\frac{n}{4}\rightarrow\frac{n}{2}}T_{\frac{n}{4}} (\hdots
 (I+P_{0\rightarrow 2} \mathcal{T}_0 R_{2\rightarrow 0})\hdots)
 R_{\frac{n}{2}\rightarrow \frac{n}{4}})R_{n\rightarrow\frac{n}{2}})(I-T_n)
-\bs{\Phi}_n = D_n L_n^{-1} \bs{\Phi}_n
+\bs{\Phi}_n =\\
+& (I+P_{\frac{n}{2}\rightarrow n} T_{\frac{n}{2}} (I+P_{\frac{n}{4}
+\rightarrow \frac{n}{2}} T_{\frac{n}{4}} (\hdots (I+P_{0 \rightarrow
+2}\mathcal{T}_0 R_{2\rightarrow 0})\hdots)R_{\frac{n}{2}\rightarrow
+\frac{n}{4}})R_{n\rightarrow \frac{n}{2}} ) D_n L_n^{-1} Q
+\end{split}
 \end{equation}  
 where :
 \begin{itemize}

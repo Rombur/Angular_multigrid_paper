@@ -1,1 +1,46 @@
 \section{Results}
+We use Fokker-Planck cross section a homogeneous domain by $5cm$ by $5cm$ and
+50 by 50 cells. We use Fokker-Planck cross section
+$\(\Sigma_{s,l}=\frac{\alpha}{2}\(L(L+1)-l(l+1)\)\)$ with $\alpha=1$
+\cite{morel_81} and a Galerkin-Legendre-Chebyshev quadrature. There is an 
+uniform isotropic source of intensity 10 $n/(cm^3s)$. We compare the number of 
+GMRES iterations (the relative tolerance is set at $10^{-4}$) and the elapsed 
+time for :
+\begin{itemize}
+\item Sweep preconditioning (S).
+\item DSA preconditioning (DSA).
+\item Angular multigrid preconditioning (MG).
+\end{itemize}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{3}{|c|}{$S_4$} & \multicolumn{3}{c|}{$S_r84$} & 
+\multicolumn{3}{c|}{$S_{16}$} \\
+\hline  
+S & DSA & MG & S & DSA & MG & S & DSA & MG\\
+\hline
+50 & 28 & 17 & 215 & 67 & 23 & 992 & 175 & 42 \\
+\hline
+\end{tabular}
+\caption{GMRES iterations}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{3}{|c|}{$S_4$} & \multicolumn{3}{c|}{$S_8$} & 
+\multicolumn{3}{|c|}{$S_{16}$} \\
+\hline  
+S & DSA & MG & S & DSA & MG & S & DSA & MG\\
+\hline
+269 & 1067 & 667 & 3380 & 4147 & 1331 & 68061 & 17595 & 5226 \\
+\hline
+\end{tabular}
+\caption{Elapsed time (s)}
+\end{center}
+\end{table}
+
