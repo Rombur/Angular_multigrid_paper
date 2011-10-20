@@ -1,25 +1,50 @@
 \section{Results}
-We use Fokker-Planck cross section a homogeneous domain by $5cm$ by $5cm$ and
-50 by 50 cells. We use Fokker-Planck cross section
-$\(\Sigma_{s,l}=\frac{\alpha}{2}\(L(L+1)-l(l+1)\)\)$ with $\alpha=1$
-\cite{morel_81} and a Galerkin-Legendre-Chebyshev quadrature. There is an 
-uniform isotropic source of intensity 10 $n/(cm^3s)$. We compare the number of 
-GMRES iterations (the relative tolerance is set at $10^{-4}$) and the elapsed 
-time for :
+In this section, we compare the number of GMRES iterations and the time needed
+to solve two problems using :
 \begin{itemize}
 \item Sweep preconditioning (S).
 \item DSA preconditioning (DSA).
-\item Angular multigrid preconditioning (MG).
+\item Angular multigrid preconditioning (ANMG).
 \end{itemize}
-
+The first problem has an uniform volumetric source while the second is beam
+problem. They both have a homogeneous medium and use Fokker-Planck cross
+section with $\alpha=1$. The quadrature used is the Gauss-Legendre-Chebyshev Galerkin
+quadrature. The domain is a $5cm$ side square. The uniform mesh is made of 50 by 50 
+cells. The GMRES solver is converged to a relative tolerance of $10^{-4}$.
+\subsection{Comparison : ANMG-DSA, ANMG-P1SA}
+Here we compare the number of GMRES iterations needed to solve ANMG-DSA and
+ANMG-P1SA. We do not compare the time since but it should be notice that it is
+harder to solve the P1SA which positive definite than the DSA which is
+symmetric positive definite. The comparison is done for $S_4$, $S_8$ and
+$S_{16}$.
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{$S_4$} & \multicolumn{2}{c|}{$S_8$} &
+\multicolumn{2}{c|}{$S_{16}$}\\
+\hline
+ANMG-DSA & ANMG-P1SA & ANMG-DSA & ANMG-P1SA & ANMG-DSA & ANMG-P1SA\\
+\hline
+17 &  15 & 23 & 28 & 42 & 70\\
+\hline
+\end{tabular}
+\caption{GMRES iterations}
+\end{center}
+\end{table}
+\subsection{Volumetric source}
+There is an uniform isotropic source of intensity 10 $n/(cm^3s)$. We compare
+the results for the following quadrature order : $S_4$, $S_8$ and $S_{16}$ $\Sigma_t$
+is chosen to be equal to $\Sigma_{s,0}$. The thickness of the slab varies from
+50 to 680 mean-free-path but stays constant at five transport mean-free-path.
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline
-\multicolumn{3}{|c|}{$S_4$} & \multicolumn{3}{c|}{$S_r84$} & 
+\multicolumn{3}{|c|}{$S_4$} & \multicolumn{3}{c|}{$S_8$} & 
 \multicolumn{3}{c|}{$S_{16}$} \\
 \hline  
-S & DSA & MG & S & DSA & MG & S & DSA & MG\\
+S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \hline
 50 & 28 & 17 & 215 & 67 & 23 & 992 & 175 & 42 \\
 \hline
@@ -33,9 +58,9 @@ S & DSA & MG & S & DSA & MG & S & DSA & MG\\
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline
 \multicolumn{3}{|c|}{$S_4$} & \multicolumn{3}{c|}{$S_8$} & 
-\multicolumn{3}{|c|}{$S_{16}$} \\
+\multicolumn{3}{c|}{$S_{16}$} \\
 \hline  
-S & DSA & MG & S & DSA & MG & S & DSA & MG\\
+S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \hline
 269 & 1067 & 667 & 3380 & 4147 & 1331 & 68061 & 17595 & 5226 \\
 \hline
@@ -44,3 +69,41 @@ S & DSA & MG & S & DSA & MG & S & DSA & MG\\
 \end{center}
 \end{table}
 
+It can be noticed that while ANMG-DSA needs the less iterations to converge, it is
+not always the fastest method. This is due to the work required by the extra
+sweeps. However, as the anisotropy of the problem increases the interest of
+ANMG-DSA becomes obvious. For the $S_{16}$ problem, ANMG-DSA takes 20 times less 
+iterations and 12 times less time than the sweep preconditioning and four times less
+iterations and three times less time than DSA. It is interesting to note that
+DSA is never better than ANMG-DSA (time and number of iterations).
+
+\subsection{Beam problem}
+In this problem, there is an incoming flux coming from the left. The flux is
+coming from the most normal direction of the quadrature. We use a $S_{16}$
+quadrature.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline  
+S & DSA & ANMG-DSA \\
+\hline
+659 & 169 & 43 \\
+\hline
+\end{tabular}
+\caption{GMRES iterations}
+\end{center}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline  
+S & DSA & ANMG-DSA \\
+\hline
+42063 & 14995 & 4623\\
+\hline
+\end{tabular}
+\caption{Elapsed time (s)}
+\end{center}
+\end{table}

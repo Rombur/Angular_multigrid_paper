@@ -1,1 +1,26 @@
 \section{Conclusion}
+In this paper, we recall the previous works done on the topic. The angular
+multigrid method in one dimension has been proven to be very efficient
+compared to DSA. For multidimensional problems, the generalized scheme does
+not show the same advantages. The spectral radius is inferior to the one of
+DSA but it can still be arbitrary close to one. Unlike the previous methods
+which solved the $S_n$ equations using the Source Iteration method, we
+recast the angular multigrid method as a preconditioner for a Krylov solver.
+The method being stabilized with a Krylov solver, two versions were possible :
+\begin{itemize}
+\item using the sequence $S_n,S_{\lceil\frac{n}{2}\rceil},\hdots,S_4,P1SA$ 
+\item using the sequence $S_n,S_{\lceil\frac{n}{2}\rceil},\hdots,S_2,DSA$
+\end{itemize}
+The first sequence was the one proposed in \cite{multigrid_1d}, while the
+second was proposed in \cite{multigrid_2d}. The authors in
+\cite{multigrid_2d}, did not use the first sequence because it is known to be
+unstable when used with SI. Both sequence where tried in this paper and the
+second one was shown to be more efficient i.e. the number of iterations is
+larger for highly anisotropic medium and P1SA (PD) is harder to invert than
+DSA (SPD). The number of iterations of the Krylov solver and the time needed
+to solve the equation was compared for Sweep preconditioning, DSA
+preconditioning and angular multigrid DSA preconditioning. The angular
+multigrid was shown to be always faster and needed less iterations than DSA.
+When the anisotropy is high enough the angular multigrid method is by far the
+fastest while the anisotropy is not high enough the extra-work to solve it
+makes it less efficient than the sweep preconditioning.

@@ -4,9 +4,9 @@ particles scattering. The applications of charged particles transport are
 legion and include radiotherapy, electronics hardening, etc. These particles 
 interact through Coulomb interactions and therefore, undergo a lot of interactions 
 but each one of them changes very slightly the energy and the direction of the 
-particle. Because of
-this, the magnitude of the scattering moments decreases very slowly and a high
-number of moments is necessary to solve the problem accurately.\\
+particle. Because of this, the magnitude of the scattering moments decreases 
+very slowly and a high number of moments is necessary to solve the problem 
+accurately.\\
 If the problem is very diffusive, it can be difficult to solve the transport
 equation discretized by the discrete ordinate method. To speed up the
 convergence, an acceleration scheme must be used. Standard acceleration schemes 
@@ -30,11 +30,13 @@ angular multigrid method needs to be stabilized in order to work. They proposed 
 filter which allows the scheme to be always stable but reduces the 
 efficiency of the method compare to the one dimensional case. The spectral 
 radius can now become arbitrary close to one when the anisotropy increases.
-SI is not the only method to solve the $S_n$ equations, another one would be
-to use a Krylov solver. Krylov solvers have been proven to be useful to
-stabilize DSA in multidimensional geometry : ``using DSA as a preconditioner
+However, the system of linear equations can also be tackled using
+non-stationary Krylov solvers, such as GMRES. A code solving the $S_n$
+equations using SI with DSA can easily be modified to use a preconditioned Krylov
+solvers. In \cite{ttg}, the authors summarizes the advantageous
+features of GMRES as follows : ``using DSA as a preconditioner
 for GMRES(m) removes the consistency requirement that plagues DSA-accelerated
-source iteration in multidimensional problems'' \cite{ttg}. Driven by this
+source iteration in multidimensional problems.'' Driven by this
 property, we propose to use the angular multigrid as a preconditioner for a 
 Krylov solver instead of an acceleration scheme for the Source Iteration
 method. The Krylov solver stabilizes the method and therefore the filter becomes
