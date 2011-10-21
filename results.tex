@@ -1,22 +1,24 @@
 \section{Results}
-In this section, we compare the number of GMRES iterations and the time needed
-to solve two problems using :
+In this section, we first compare the number of GMRES iteration needed by 
+ANMG-DSA and ANMG-P1SA to solve a test case. Then, both the number of GMRES 
+iterations and the elapsed time are compared for three methods :
 \begin{itemize}
 \item Sweep preconditioning (S).
 \item DSA preconditioning (DSA).
-\item Angular multigrid preconditioning (ANMG).
+\item Angular multigrid with DSA preconditioning (ANMG-DSA).
 \end{itemize}
-The first problem has an uniform volumetric source while the second is beam
-problem. They both have a homogeneous medium and use Fokker-Planck cross
-section with $\alpha=1$. The quadrature used is the Gauss-Legendre-Chebyshev Galerkin
-quadrature. The domain is a $5cm$ side square. The uniform mesh is made of 50 by 50 
+The tests use a homogeneous medium and Fokker-Planck cross
+sections with $\alpha=1$. $\Sigma_{t}$ is chosen to be equal to
+$\Sigma_{s,0}$. The quadrature is the Gauss-Legendre-Chebyshev Galerkin
+quadrature. The domain is a $5cm$ side square and the uniform mesh is made 
+of 50 by 50 
 cells. The GMRES solver is converged to a relative tolerance of $10^{-4}$.
-\subsection{Comparison : ANMG-DSA, ANMG-P1SA}
-Here we compare the number of GMRES iterations needed to solve ANMG-DSA and
-ANMG-P1SA. We do not compare the time since but it should be notice that it is
+\subsection{Comparison between ANMG-DSA and ANMG-P1SA}
+The number of GMRES iterations needed to solve ANMG-DSA and
+ANMG-P1SA are compared unlike the elapsed time but it should be notice that it is
 harder to solve the P1SA which positive definite than the DSA which is
 symmetric positive definite. The comparison is done for $S_4$, $S_8$ and
-$S_{16}$.
+$S_{16}$. 
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -32,10 +34,14 @@ ANMG-DSA & ANMG-P1SA & ANMG-DSA & ANMG-P1SA & ANMG-DSA & ANMG-P1SA\\
 \caption{GMRES iterations}
 \end{center}
 \end{table}
+From this result, it can be see than ANMG-DSA outperform ANMG-P1SA except for
+$S_4$. When the anisotropy of the problem increases, the advantage of ANMG-DSA
+over ANMG-P1SA increases. For this reason, only the ANMG-DSA will be compared
+to the other methods in the next two tests.
 \subsection{Volumetric source}
-There is an uniform isotropic source of intensity 10 $n/(cm^3s)$. We compare
-the results for the following quadrature order : $S_4$, $S_8$ and $S_{16}$ $\Sigma_t$
-is chosen to be equal to $\Sigma_{s,0}$. The thickness of the slab varies from
+For this test, there is an uniform isotropic source of intensity 10 $n/(cm^3s)$. 
+We compare the results for the following quadrature order : $S_4$, $S_8$ and 
+$S_{16}$. The thickness of the slab varies from
 50 to 680 mean-free-path but stays constant at five transport mean-free-path.
 \begin{table}[H]
 \begin{center}
@@ -52,7 +58,6 @@ S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \caption{GMRES iterations}
 \end{center}
 \end{table}
-
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
@@ -68,20 +73,19 @@ S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \caption{Elapsed time (s)}
 \end{center}
 \end{table}
-
-It can be noticed that while ANMG-DSA needs the less iterations to converge, it is
+It can be noticed that while ANMG-DSA needs the least iterations to converge, it is
 not always the fastest method. This is due to the work required by the extra
 sweeps. However, as the anisotropy of the problem increases the interest of
-ANMG-DSA becomes obvious. For the $S_{16}$ problem, ANMG-DSA takes 20 times less 
-iterations and 12 times less time than the sweep preconditioning and four times less
-iterations and three times less time than DSA. It is interesting to note that
-DSA is never better than ANMG-DSA (time and number of iterations).
+ANMG-DSA becomes obvious. For the $S_{16}$ problem, ANMG-DSA requires 20 times less 
+iterations and 12 times less time than the sweep preconditioning. 
+Compared to DSA, ANMG-DSA needs four times less iterations and three times less 
+time. It is interesting to note that DSA is never more efficient (elapsed
+time and number of iterations) than ANMG-DSA.
 
 \subsection{Beam problem}
-In this problem, there is an incoming flux coming from the left. The flux is
-coming from the most normal direction of the quadrature. We use a $S_{16}$
-quadrature.
-
+In this problem, there is an incoming flux of intensity 10 $n/(cm^3s)$ 
+coming from the left. The flux is coming from the most normal direction 
+of the $S_{16}$ quadrature. 
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -107,3 +111,5 @@ S & DSA & ANMG-DSA \\
 \caption{Elapsed time (s)}
 \end{center}
 \end{table}
+These results are very similar to the previous ones and confirm the advantages
+of ANMG-DSA over DSA and sweep preconditioning. 
