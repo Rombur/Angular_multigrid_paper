@@ -4,7 +4,8 @@ method. For one dimensional geometry, this scheme has been proven to be very
 efficient compared to DSA. When using Fokker-Planck cross sections, the
 spectral radius of the method is bounded by 0.6 while SI+DSA is bounded by 1. 
 For multidimensional problems, the generalized scheme does
-not show the same behavior. The angular multigrid method needs to be stabilize
+not show the same behavior. The angular multigrid method needs to be
+stabilized
 by a filter which degrades the spectral radius. The spectral radius is inferior 
 to the one of DSA but it can still be arbitrary close to one. 
 Unlike the previous methods which solved the $S_n$ equations using the Source 
@@ -16,9 +17,9 @@ S_{\lceil\frac{n}{2}\rceil},\hdots,S_2,DSA$.
 The first sequence was proposed in \cite{multigrid_1d}, the second in 
 \cite{multigrid_2d}. In \cite{multigrid_2d}, the authors did not use the first
 sequence because it is known to be unstable for multidimensional problem when 
-used with SI. Both sequence were tried using GMRES as Krylov solver and the 
+used with SI. Both sequences were tried using GMRES as Krylov solver and the 
 second one was shown to be more 
-efficient i.e. the number of GMRES iterations is smaller for highly 
+efficient, i.e. the number of GMRES iterations is smaller for highly 
 anisotropic medium and P1SA (PD) is harder to invert than
 DSA (SPD). The number of GMRES iterations and the time needed
 to solve the equations were compared for sweep preconditioning, DSA

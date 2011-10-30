@@ -1,21 +1,21 @@
 \section{Introduction}
-Highly anisotropic scattering is very common because it describes charged
-particles scattering. The applications of charged particles transport are
-legion and include radiotherapy, electronics hardening, etc. These particles 
-interact through Coulomb interactions and therefore, undergo a lot of interactions 
-but each one of them changes very slightly the energy and the direction of the 
-particle. Because of this, the magnitude of the scattering moments decreases 
-very slowly and a high number of moments is necessary to solve the problem 
-accurately.\\
-If the problem is very diffusive, it can be difficult to solve the transport
+Highly anisotropic scattering describes charged-particle scattering. 
+The applications of charged-particle transport are ubiquitous and include radiotherapy, 
+electronics hardening, etc. These particles interact through Coulomb
+interactions. Therefore, each particle undergoes a very large number of
+interactions with each one very slightly changes the energy and the particle.
+Because of this, the magnitude of the angular moments of the particle flux
+distribution decreases very slowly and, a high number of moments is 
+necessary to solve the problem accurately.\\
+If the scattering ratio is high, it can be difficult to solve the transport
 equation discretized by the discrete ordinate method. To speed up the
 convergence, an acceleration scheme must be used. Standard acceleration schemes 
 like Diffusion Synthetic Acceleration (DSA) focus on accelerating the isotropic 
 part of the flux, only the zeroth or the zeroth and the first flux 
 moments are accelerated \cite{adams}. This is very efficient for neutron transport 
-but not for charged particle transport. The spectral radius of the Source
+but not for charged-particle transport. The spectral radius of the Source
 Iteration (SI) method accelerated by DSA becomes arbitrary close to one when the 
-anisotropy increases in a diffusive medium. Therefore, other methods have been 
+anisotropy increases and the scattering ratio is close to one. Therefore, other methods have been 
 developed to accelerate higher order flux moments 
 \cite{kassem,multigrid_1d,multigrid_2d}.\\
 Morel an Manteuffel developed in \cite{multigrid_1d} an angular multigrid
@@ -28,7 +28,7 @@ errors. The results were very encouraging and Pautz et al. generalized this meth
 to multidimensional geometries \cite{multigrid_2d}. This multidimensional
 angular multigrid method needs to be stabilized. They proposed a 
 filter which allows the scheme to be always stable but reduces the 
-efficiency of the method compare to the one dimensional case. The spectral 
+efficiency of the method compared to the one dimensional case. The spectral 
 radius can now become arbitrary close to one when the anisotropy increases.
 These two schemes used the angular multigrid method as an acceleration scheme
 for SI but this is not the only method to solve the $S_n$ equations. The system 
@@ -42,7 +42,7 @@ Krylov solver instead of an acceleration scheme for the Source Iteration
 method. The Krylov solver stabilizes the method and therefore, the filter becomes
 unnecessary. A code solving the $S_n$ equations using SI with DSA can easily
 be modified to use preconditioned Krylov solver. The paper is organized as 
-follows : in Section 2, we present the
-notation and the discretized transport equation,  we recall the
-previous works done on this topic and the method that we propose, in Section
+follows; in Section 2, we present the
+notation and the discretized transport equation and we recall the
+previous works done on this topic and the method that we propose. In Section
 3, we show some results and in Section 4, we end with the conclusion.

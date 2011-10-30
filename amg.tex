@@ -31,7 +31,7 @@ commonly employed is the incoming flux boundary condition :
 }\br\in \partial \mathcal{D}
 \label{boundary}
 \end{equation} 
-where $\partial \mathcal{D}$ is the boundary of the problem. If $g=0$, equation
+where $\partial \mathcal{D}$ is the boundary of the domain. If $g=0$, equation
 (\ref{boundary}) yields the vacuum boundary condition.
 Next, equation (\ref{transport}) is discretized in energy using the standard 
 multigroup method \cite{reuss} and in angle using the discrete ordinate method
@@ -54,7 +54,7 @@ where :
 \item $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)Y_l^{m,*}(\bo)\ d\bo$
 \end{itemize}
 This equation still needs to be discretized in space but the method proposed
-in this paper is not bounded to any spatial discretization.\\ 
+in this paper is not limited to any spatial discretization.\\ 
 Equation (\ref{discretized}) can be written using operator notation as :
 \begin{equation}
 L \bs{\Psi} = M\Sigma D \bs{\Psi} + \bs{Q}
@@ -76,8 +76,9 @@ by :
 \begin{equation}
 L\bs{\Psi}^{(k)} = M\Sigma D \bs{\Psi}^{(k-1)} + \bs{Q}
 \end{equation}
-The spectral radius of SI can become arbitrary close to one in diffusive
-medium. To accelerate the convergence of SI, the Diffusion Synthetic
+The spectral radius of SI can become arbitrary close to one when the
+scattering ratio $\(\frac{\Sigma_{s,0}}{\Sigma_t}\)$ is close to one. 
+To accelerate the convergence of SI, the Diffusion Synthetic
 Acceleration scheme \cite{adams} is commonly used. The SI+DSA scheme is given by :
 \begin{align}
 &\bs{\Phi}^{(k+1/2)} = DL^{-1}M\Sigma\bs{\Phi}^{(k)} + DL^{-1}\bs{Q}\\
@@ -116,7 +117,7 @@ DL^{-1}M\Sigma-P_{0/1\rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0}\)
 R_{n\rightarrow 0})DL^{-1} Q
 \end{split}
 \end{equation}
-Thus, the system of equation solved with the Krylov method is :
+Thus, the system of equations solved with the Krylov method is :
 \begin{equation}
 \((I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})(I-DL^{-1}M\Sigma)\)
 \bs{\Phi} = (I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})DL^{-1}Q
@@ -167,7 +168,7 @@ sections, the corrected cross sections are given by :
 \textrm{ with }j=t \textrm{ or }s,l
 \end{equation}
 This correction is said to be optimal because for an infinite homogeneous medium, 
-it minimizes the ``high-frequency'' angular errors since the smoothing factor is 
+it minimizes the ``high-frequency'' angular errors, the smoothing factor being 
 given by :
 \begin{equation}
 \rho_s =
@@ -292,7 +293,9 @@ R_{{n}/{2}\rightarrow {n}/{4}})R_{n\rightarrow{n}/{2}})(I-T_n)
 \end{equation}  
 At this point, it is necessary to choose a DSA scheme. Among different
 schemes (see \cite{adams}), the Modified Interior Penalty (MIP) DSA was
-chosen \cite{mip}. This DSA uses bilinear discontinuous finite elements, which is
+chosen \cite{mip}. This DSA is based on a second-order discontinuous of a
+diffusion equation, as opposed to a mixed of $P1$ formulation.
+It uses bilinear discontinuous finite elements, which is
 the same spatial discretization that the one chosen for the
 $S_n$ equations. Moreover, it has been shown to be always stable for isotropic
 scattering and is symmetric positive definite (SPD), which makes it easy to invert.
@@ -305,7 +308,7 @@ with :
 \begin{split}
 b_{MIP}(\phi,\phi^*) =& (\Sigma_a \phi,\phi^*)_{\partial D} +
 \(D\bn\phi,\bn\phi^*\)_{\mathcal{D}} + \(\kappa_e\llb\phi\rrb,\llb\phi^*\rrb\)_{E_h^i}
-+ \(\llb\phi\rrb,\ldb D\partial_n \phi\rdb\)_{E_h^i} +\\
++ \(\llb\phi\rrb,\ldb D\partial_n \phi^*\rdb\)_{E_h^i} +\\
 &(\ldb D \partial_n \phi\rdb,\llb\phi^*\rrb)_{E_h^i} + (\kappa_e\phi,\phi^*)_{\partial
 D^d}-\frac{1}{2} \(\phi,D\partial_n \phi^*\)_{\partial
 \mathcal{D}^d} - \frac{1}{2} (D \partial_n \phi,\phi^*)_{\partial \mathcal{D}^d}
