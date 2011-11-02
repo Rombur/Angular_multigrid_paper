@@ -97,7 +97,7 @@ When using a Krylov solver, equation (\ref{operator}) has to be rewritten as :
 (I-DL^{-1}M\Sigma) \bs{\Phi} = DL^{-1}\bs{Q}
 \label{krylov}
 \end{equation}
-where $I$ is the identity matrix. Equation (\ref{krylov}) is the equation
+where $I$ is the identity matrix. Equation (\ref{krylov}) is equation
 (\ref{operator}) preconditioned by $DL^{-1}$ (sweep preconditioning). DSA can also 
 help to speed up the
 convergence of the Krylov solver. First, the accelerated scheme needs to be
@@ -117,13 +117,13 @@ DL^{-1}M\Sigma-P_{0/1\rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0}\)
 R_{n\rightarrow 0})DL^{-1} Q
 \end{split}
 \end{equation}
-Thus, the system of equations solved with the Krylov method is :
+The system of equations solved with the Krylov method is :
 \begin{equation}
 \((I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})(I-DL^{-1}M\Sigma)\)
 \bs{\Phi} = (I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})DL^{-1}Q
 \end{equation}       
 \subsection{Previous work}
-Like mentioned previously, only the zeroth and the first flux moments can be
+As mentioned previously, only the zeroth and the first flux moments can be
 accelerated with DSA. To accelerate higher moments, other methods have to be
 used \cite{kassem,multigrid_1d}. Morel and Manteuffel have proposed an angular 
 multigrid method to accelerate the inner SI calculation of the one dimension 
@@ -133,7 +133,7 @@ transport correction \cite{lathrop} to attenuate the ``upper half'' of the
 flux moments thanks to the transport sweep. The ``lower half'' of the flux
 moments is accelerated using the $S_n$ equations with only half the angles.
 These $S_n$ equations with half the angles are themselves accelerated using the same
-technique. The number of angles is divided by 2 until the $S_4$ equations are
+technique. The number of angles is divided by two until the $S_4$ equations are
 solved. At this point, the $P1$ equations are used to accelerate the $S_4$
 equations. If we define :
 \begin{equation}
@@ -150,7 +150,7 @@ The scheme works as follows :
 \item Perform a transport sweep for the $S_{n_2}$ equations with a $P_{n_2-1}$
 expansions using the $S_n$ residual as the inhomogeneous source, where
 $n_2=Half(n)$.
-\item Continue coarsening the angular grid by a factor 2 (i.e., according to
+\item Continue coarsening the angular grid by a factor two (i.e., according to
 the definition of ``$Half$'') until a sweep has been performed for the $S_4$
 equations.
 \item Solve the $P_1$ equations (P1SA) with a $P_1$ expansion of the $S_4$
@@ -207,7 +207,7 @@ definition of ``$Half$'') until a sweep has been performed for the $S_2$
 equations.
 \item Solve the diffusion equation with a $P_0$ expansion for the $S_2$
 residual as the inhomogeneous source. 
-\item Apply a diffusive filter to the corrections from step 2 and 3 (without
+\item Apply a diffusive filter to the corrections from step two and three (without
 this filter, the method is unstable).
 \item Add the corrections from steps 4 and 5 to the Legendre moments of the
 $S_n$ iterate to obtain the accelerated $S_n$ moments.
@@ -225,8 +225,8 @@ stabilize the method, two variations are possible :
 \item the coarsest level can be DSA (ANMG-DSA).
 \item the coarsest level can be P1SA (ANMG-P1SA).
 \end{itemize}
-First, we will present the angular multigrid using DSA and then, the angular
-multigrid using P1SA. Later, this two versions will be compared.
+First, we present the angular multigrid using DSA and then, the angular
+multigrid using P1SA. Later, this two versions are be compared.
 \subsubsection{ANMG-DSA}
 Using a method similar to the one we used to write the equation for the 
 preconditioned Krylov solver, we get
@@ -274,7 +274,7 @@ n/2}+ \hdots + \right.\\
 D_nL_n^{-1} Q
 \end{split}
 \end{equation}
-where $T_n = D_n L_n^{-1}M_n \Sigma_n$, the subscript $n$ being there to remind
+where $T_n = D_n L_n^{-1}M_n \Sigma_n$. We use the subscript $n$ as a reminder
 that we are solving the $S_n$ equations.\\
 Finally, the system of equations which has to be solved is :
 \begin{equation}
@@ -297,7 +297,7 @@ chosen \cite{mip}. This DSA is based on a second-order discontinuous of a
 diffusion equation, as opposed to a mixed of $P1$ formulation.
 It uses bilinear discontinuous finite elements, which is
 the same spatial discretization that the one chosen for the
-$S_n$ equations. Moreover, it has been shown to be always stable for isotropic
+$S_n$ equations and it has been shown to be always stable for isotropic
 scattering and is symmetric positive definite (SPD), which makes it easy to invert.
 We will recall here the weak form of this DSA :
 \begin{equation}
@@ -366,7 +366,7 @@ T_{n/4}(\hdots(I+P_{1\rightarrow 4}\mathcal{T}_1^{-1} R_{4\rightarrow
 \end{split}
 \end{equation}
 where $\mathcal{T}_1$ is the P1SA operator.\\
-The P1SA that will be used is the P1C defined in \cite{yaqi}. This scheme,
+The P1SA used is the P1C defined in \cite{yaqi}. This scheme,
 which is positive definite but non-symmetric, is given by :
 \begin{equation}
 b_{P1C}(\Phi,\bs{J},\Phi^*,\bs{J}^*) = l_{P1C}(\Phi^*,\bs{J}^*)

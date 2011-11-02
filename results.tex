@@ -10,13 +10,13 @@ iterations and the elapsed time are compared for three methods :
 The tests use a homogeneous medium and Fokker-Planck cross
 sections with $\alpha=1$. $\Sigma_{t}$ is chosen to be equal to
 $\Sigma_{s,0}$. The quadrature is the Gauss-Legendre-Chebyshev Galerkin
-quadrature. The domain is a $5cm$ side square and the uniform mesh is made 
+quadrature. The domain is a $5cm$ side square and the uniform mesh is composed
 of 50 by 50 
 cells. The GMRES solver is converged to a relative tolerance of $10^{-4}$.
 \subsection{Comparison between ANMG-DSA and ANMG-P1SA}
 The number of GMRES iterations needed to solve ANMG-DSA and
-ANMG-P1SA are compared unlike the elapsed time but it should be notice that it is
-harder to solve the P1SA which positive definite than the DSA which is
+ANMG-P1SA are compared unlike the elapsed time. It should be noticed that it is
+harder to solve the P1SA, which positive definite, than the DSA which is
 symmetric positive definite. The comparison is done for $S_4$, $S_8$ and
 $S_{16}$. 
 \begin{table}[H]
@@ -98,7 +98,6 @@ S & DSA & ANMG-DSA \\
 \caption{GMRES iterations}
 \end{center}
 \end{table}
-
 \begin{table}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|}
