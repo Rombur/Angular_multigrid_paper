@@ -1,80 +1,72 @@
-\section{Angular multigrid}
+\section{Review of iterative solution techniques applied to the $S_n$
+transport equation}
 In this section, we first give the multigroup $S_n$ transport equations. Next,
 the Source Iteration technique is recalled and the $S_n$ equations are
-recast to be solved by a Krylov solver. Then, the previous works on angular
-multigrid methods are presented. Finally, this section is concluded by the derivation
-of our method.  
-\subsection{Multigroup $S_n$ transport equations} 
-Charged particles transport can be described by the Boltzmann equation :
-\begin{equation}
-\bo \cdot \bn \Psi(\br,\bo,E) + \Sigma_t(\br,\bo,E) \Psi(\br,\bo,E) =
-\int_{4\pi}\!\!\int_{0}^{\infty}\Sigma_s(\br,\bo\cdot\bo',E'\rightarrow
-E)\Psi(\br,\bo',E')\ dE'd\bo'+Q(\br,\bo,E) 
-\label{transport}
-\end{equation}
-where :
-\begin{itemize}
-\item $\Psi$ is the angular flux
-\item $\Sigma_t$ is the total macroscopic cross section
-\item $\Sigma_s$ is the macroscopic differential scattering cross section
-\item $Q$ is a volumetric source
-\item $\br$ is the position
-\item $E$ is the energy
-\item $\bo = (\mu,\phi)$
-\item $\mu$ is the cosine of the directional polar angle
-\item $\phi$ is the directional azimuthal angle
-\end{itemize}
-Standard boundary conditions can be applied to (\ref{transport}); the most
-commonly employed is the incoming flux boundary condition :
-\begin{equation}
-\Psi(\br,\bo,E) = g(\br,\bo,E)\textrm{ for }\bo\cdot\bs{n}<0\textrm{ and
-}\br\in \partial \mathcal{D}
-\label{boundary}
-\end{equation} 
-where $\partial \mathcal{D}$ is the boundary of the domain. If $g=0$, equation
-(\ref{boundary}) yields the vacuum boundary condition.
-Next, equation (\ref{transport}) is discretized in energy using the standard 
-multigroup method \cite{reuss} and in angle using the discrete ordinate method
-\cite{reuss} :
+recast to be solved by a Krylov solver. Previous work on angular
+multigrid methods applied as preconditioner to SI is presented. Finally, we
+conclude this section with the derivation of the new method.  
+\subsection{Multigroup $S_n$ equations} 
+Charged particles transport can be described by the Boltzmann equation
+\cite{graal} which discretized in energy using the standard multigroup method
+\cite{reuss} and in angle using the discrete ordinate method \cite{reuss}, is
+given by :
 \begin{equation}
 \bo_d \cdot \bn \Psi_d^g(\br) + \Sigma_{t,g}^g(\br) \Psi_d^g(\br) = \sum_{g'=0}^G
 \sum_{l=0}^L\sum_{m=-l}^l \frac{2l+1}{4\pi}\Sigma_{s,l}^{g'\rightarrow
 g}\Phi_{l,m}^{g'}(\br)Y_l^m(\bo_d) + Q_d^g(\br)
 \label{discretized}
 \end{equation}
-where :
-\begin{itemize}
-\item $\Psi_d^g(\br)=\int_{E^{g}}^{E^{g-1}}\Psi(\br,\bo_d,E)\ dE$
-\item $\Sigma_{t,d}^g(\br) = \frac{\int_{E^{g}}^{E^{g-1}}\Sigma_t(\br,\bo_d,E)
-\Psi(\br,\bo_d,E) dE}{\int_{E^g}^{E^{g-1}}\Psi(\br,\bo_d,E) dE}$
-\item $\Sigma_{s,l}$ is the Legendre moment of degree $l$ of $\Sigma_s$
-\item $Q_d^g(\br) = \int_{E^g}^{E^{g-1}}Q(\br,\bo_d,E) dE$
-\item $\bo_d = (\mu_d,\phi_d)$
-\item $Y_l^m$ are the spherical harmonics
-\item $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)Y_l^{m,*}(\bo)\ d\bo$
-\end{itemize}
+where $\br$ is the position in domain $\mathcal{D}$, $E$ is the energy,
+$\bo_d=(\mu_d,\varphi_d)$, $\mu_d$ is the cosine of the directional polar angle,
+$\varphi_d$ is the directional azimuthal angle, 
+$\Psi_d^g(\br)=\int_{E^{g}}^{E^{g-1}}\Psi(\br,\bo_d,E)\ dE$, $\Psi$ is
+the angular flux, $Q_d^g(\br) = \int_{E^g}^{E^{g-1}}Q(\br,\bo_d,E) dE$, $Q$ is
+a volumetric source, $\Sigma_{t}^g(\br)$ is the multigroup total 
+macroscopic cross section, $\Sigma_{s,l}$ is the Legendre moment of 
+degree $l$ of $\Sigma_s$ and $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)Y_l^{m,*}(\bo)\ d\bo
+\approx \sum_{d=1} w_d \Psi(\br,\bo_d,E)Y_l^{m,*}(\bo_d)$ where $Y_l^m$ 
+are the spherical harmonics.
+Standard boundary conditions can be applied to (\ref{discretized}); the most
+commonly employed is the incoming flux boundary condition :
+\begin{equation}
+\Psi(\br,\bo,E) = g(\br,\bo,E)\textrm{ for }\bo\cdot\bs{n}<0\textrm{ and
+}\br\in \partial \mathcal{D},
+\label{boundary}
+\end{equation} 
+where $\partial \mathcal{D}$ is the boundary of the domain $\mathcal{D}$. If $g=0$, equation
+(\ref{boundary}) yields vacuum boundary conditions.\\
 This equation still needs to be discretized in space but the method proposed
-in this paper is not limited to any spatial discretization.\\ 
+in this paper is not restricted to a particular spatial discretization. For
+the results presented here, we use bilinear discontinuous finite elements in
+two dimensional space problem \cite{dgfem}.\\ 
 Equation (\ref{discretized}) can be written using operator notation as :
 \begin{equation}
 L \bs{\Psi} = M\Sigma D \bs{\Psi} + \bs{Q}
 \label{operator}
 \end{equation}
-where :
-\begin{itemize}
-\item $L = \bo\cdot \bullet + \Sigma_t \bullet$
-\item $\bs{\Psi}$ is a vector containing all the $\Psi_d$
-\item $\bs{Q}$ is a vector containing all the $Q_d$
-\item $\Sigma$ is a diagonal matrix with the element $\Sigma_{s,l}$ as
-diagonal elements
-\item $M$ is the moment-to-discrete matrix ($\bs{\Psi}=M\bs{\Phi}$)
-\item $D$ is the discrete-to-moment matrix ($\bs{\Phi}=D\bs{\Psi}$)
-\end{itemize}
+where $\bs{\Psi}$ is a vector containing all the $\Psi_d$, $\bs{Q}$ is a
+vector containing all the $Q_d$, $\Sigma$ is a diagonal matrix with the
+element $\Sigma_{s,l}$ as diagonal elements, $M$ is the moment-to-discrete
+matrix $(\bs{\Psi} = M\bs{\Phi})$, $D$ is the discrete-to-moments matrix
+$(\Phi=D\Psi)$ (the moment entries are dictated  by the dimensionality of the
+problem) and $L = \bo\cdot + \Sigma_t$ is the streaming + total interaction operator,
+inverted direction by direction (transport sweeps). The inversion can be done
+locally for each mesh cell for each discrete directional fluxes in the
+quadrature.\\
+The cross section used here are the Fokker-Planck cross sections :
+\begin{equation}
+\Sigma_{s,l}=\frac{\alpha}{2} (L(L+1)-l(l+1))\ \ l=0,\hdots,L
+\end{equation}
+where $\alpha$ is the restricted momentum transfer \cite{morel_96}.
+These cross sections approximate the electron scattering cross sections
+\cite{morel_81} and require Galerkin quadratures , i.e.,
+$D=M^{-1}$ \cite{graal}, to obtain accurate results.
+\subsection{Solution techniques}
 Equation (\ref{operator}) can be solved using the Source Iteration method or a
 Krylov method. The Source Iteration method at the $k^{th}$ iteration is given
 by :
 \begin{equation}
-L\bs{\Psi}^{(k)} = M\Sigma D \bs{\Psi}^{(k-1)} + \bs{Q}
+\bs{\Phi}^{(k+1)} = DL^{-1}M\Sigma \bs{\Phi}^{(k)} + DL^{-1}\bs{Q}
 \end{equation}
 The spectral radius of SI can become arbitrary close to one when the
 scattering ratio $\(\frac{\Sigma_{s,0}}{\Sigma_t}\)$ is close to one. 
@@ -87,10 +79,17 @@ Acceleration scheme \cite{adams} is commonly used. The SI+DSA scheme is given by
 &\bs{\Phi}^{(k+1)} = \bs{\Phi}^{(k+1/2)} + P_{0/1 \rightarrow n} \delta
 \bs{\Phi}^{(k)}
 \end{align}
+Finally, we get :
+\begin{equation}
+\bs{\Phi}^{(k+1)} = \((I+P_{0/1\rightarrow n} \mathcal{T}_0^{-1} R_{n\rightarrow 0} )
+DL^{-1}M\Sigma-P_{0/1\rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0}\)
+\bs{\Phi}^{(k)} + (I+P_{0/1\rightarrow n}\mathcal{T}_0^{-1}
+R_{n\rightarrow 0})DL^{-1} Q
+\end{equation}
 where $\mathcal{T}_0$ is the DSA operator, $R_{n\rightarrow 0}$ is the
 restriction matrix of $\bs{\Phi}_{n}$ to $\bs{\Phi}_0$ and $P_{0/1 \rightarrow
-n}$ is the projection matrix of $\bs{\Phi}_0$ or $\bs{\Phi}_1$, depending if
-only the zeroth or the zeroth and the first moment are accelerated, to
+n}$ is the projection matrix of $\bs{\Phi}_0$ or $\bs{\Phi}_1$, depending
+whether only the zeroth or the zeroth and the first moment are accelerated, to
 $\bs{\Phi}_n$.\\
 When using a Krylov solver, equation (\ref{operator}) has to be rewritten as :
 \begin{equation}
@@ -99,43 +98,28 @@ When using a Krylov solver, equation (\ref{operator}) has to be rewritten as :
 \end{equation}
 where $I$ is the identity matrix. Equation (\ref{krylov}) is equation
 (\ref{operator}) preconditioned by $DL^{-1}$ (sweep preconditioning). DSA can also 
-help to speed up the
-convergence of the Krylov solver. First, the accelerated scheme needs to be
-rewritten :
-\begin{equation}
-\begin{split}
-\bs{\Phi}^{(k+1)} &= \bs{\Phi}^{(k)}+\delta\bs{\Phi}^{(k)}\\
-&= DL^{-1}M\Sigma\bs{\Phi}^{(k)}+DL^{-1}\bs{Q}+P_{0/1\rightarrow
-n} \mathcal{T}_0^{-1} R_{n\rightarrow 0}(\bs{\Phi}^{(k+1/2)}
--\bs{\Phi}^{(k)})\\
-&= DL^{-1}M\Sigma\bs{\Phi}^{(k)}+DL^{-1}\bs{Q}+P_{0/1\rightarrow
-n} \mathcal{T}_0^{-1} R_{n\rightarrow 0} (DL^{-1}M\Sigma
-\bs{\Phi}^{(k)}+DL^{-1}\bs{Q}-\bs{\Phi}^{(k)})\\
-&= \((I+P_{0/1\rightarrow n} \mathcal{T}_0^{-1} R_{n\rightarrow 0} )
-DL^{-1}M\Sigma-P_{0/1\rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0}\)
-\bs{\Phi}^{(k)} + (I+P_{0/1\rightarrow n}\mathcal{T}_0^{-1}
-R_{n\rightarrow 0})DL^{-1} Q
-\end{split}
-\end{equation}
-The system of equations solved with the Krylov method is :
+help to speed up the convergence of the Krylov solver. The system of equations 
+solved with the Krylov method is :
 \begin{equation}
 \((I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})(I-DL^{-1}M\Sigma)\)
 \bs{\Phi} = (I+P_{0/1 \rightarrow n}\mathcal{T}_0^{-1} R_{n\rightarrow 0})DL^{-1}Q
 \end{equation}       
-\subsection{Previous work}
+\subsection{Review of previous angular multigrid work}
+\subsubsection{One dimensional geometry}
 As mentioned previously, only the zeroth and the first flux moments can be
 accelerated with DSA. To accelerate higher moments, other methods have to be
-used \cite{kassem,multigrid_1d}. Morel and Manteuffel have proposed an angular 
+used. Morel and Manteuffel have proposed an angular 
 multigrid method to accelerate the inner SI calculation of the one dimension 
 $S_n$ equations when the scattering is highly anisotropic 
-\cite{multigrid_1d}. Their idea was to use a variation of the extended
+\cite{multigrid_1d}. The motivation to use a variation of the extended
 transport correction \cite{lathrop} to attenuate the ``upper half'' of the
-flux moments thanks to the transport sweep. The ``lower half'' of the flux
-moments is accelerated using the $S_n$ equations with only half the angles.
-These $S_n$ equations with half the angles are themselves accelerated using the same
-technique. The number of angles is divided by two until the $S_4$ equations are
-solved. At this point, the $P1$ equations are used to accelerate the $S_4$
-equations. If we define :
+flux moments (higher frequencies) thanks to transport sweeps. The ``lower half'' 
+of the flux moments (lower frequencies) is accelerated using the $S_{n/2}$ 
+equations. These $S_{n/2}$ equations are themselves 
+accelerated using $S_{n/4}$ equations. The order of the transport operator is 
+divided by two 
+until the $S_4$ equations are solved. At this point, the $P_1$ equations are 
+used to accelerate the $S_4$ equations. We define :
 \begin{equation}
 Half(n) = \left\{
 \begin{aligned}
@@ -144,7 +128,7 @@ Half(n) = \left\{
 \end{aligned}
 \right.
 \end{equation}
-The scheme works as follows : 
+Their scheme works as follows : 
 \begin{enumerate}
 \item Perform a transport sweep for the $S_n$ equations.
 \item Perform a transport sweep for the $S_{n_2}$ equations with a $P_{n_2-1}$
@@ -176,25 +160,21 @@ given by :
 |\Sigma_{s,n-1}|/\Sigma_{s,0})
 \end{equation}
 To compare the effectiveness of the angular multigrid method with DSA, 
-Fokker-Planck scattering cross sections can be used. These cross sections 
-approximate the electron scattering cross sections \cite{morel_81} :
-\begin{equation}
-\Sigma_{s,l} = \frac{\alpha}{2} (L(L+1)-l(l+1))\ \ \ l=0,\hdots,L
-\end{equation}
-where $\alpha$ is the restricted momentum transfer \cite{morel_96}. In one dimension,
+Fokker-Planck scattering cross sections can be used. In one dimension,
 DSA becomes less efficient as $\Sigma_{s,l}$ $(l>0)$ becomes closer to
-$\Sigma_{s,0}$ with increasing anisotropy order L. In the limit as 
-$L\rightarrow \infty$, DSA no
-longer accelerate the convergence. The spectral radius tends to 1.0 and thus,
+$\Sigma_{s,0}$. Therefore, in the limit as $L\rightarrow \infty$, DSA no
+longer accelerates the convergence of SI when Fokker-Planck cross section are used. 
+The spectral radius tends to 1.0 and thus,
 the acceleration scheme is inefficient. However, the spectral radius of the
 angular multigrid method has an upper bound of 0.6 when $L$ goes to
-infinity.\\
+infinity.
+\subsubsection{Extension to multidimensional geometries}
 In the multidimensional case, DSA becomes unstable when both the zeroth
 and the first flux moments are accelerated and $\frac{\Sigma_{s,1}}{\Sigma_t}
 \geq 0.5$ \cite{multisweep}. In \cite{multigrid_2d}, the authors modified the
 one dimensional angular multigrid method by accelerating only the zeroth flux
-moment with the DSA but to compensate for the loss of a more effective DSA,
-the lowest transport sweep is an $S_2$ sweep instead of an $S_4$. Moreover, a
+moment with the DSA and by using $S_2$ as lowest transport sweep
+instead of an $S_4$. Moreover, a
 filter is now needed to stabilize the method. Therefore, the angular multigrid 
 method was modified as follows \cite{multigrid_2d} :
 \begin{enumerate}
@@ -207,30 +187,29 @@ definition of ``$Half$'') until a sweep has been performed for the $S_2$
 equations.
 \item Solve the diffusion equation with a $P_0$ expansion for the $S_2$
 residual as the inhomogeneous source. 
-\item Apply a diffusive filter to the corrections from step two and three (without
+\item Apply a diffusive filter to the corrections from steps 2 and 3 (without
 this filter, the method is unstable).
 \item Add the corrections from steps 4 and 5 to the Legendre moments of the
 $S_n$ iterate to obtain the accelerated $S_n$ moments.
 \end{enumerate}
 The filter stabilizes the method which otherwise would diverge but it reduces
 the efficiency of the angular multigrid. The spectral radius can become
-arbitrary close to one when $L$ becomes large.
-\subsection{Angular multigrid with Krylov solver}
+arbitrary close to one when $L$ becomes large \cite{multigrid_2d}.
+\section{Angular multigrid with Krylov solver}
 In this paper, we propose to abandon SI as the solver for the $S_n$ equations 
 and to use the angular multigrid method as a preconditioner for the Krylov solver. 
-The successive corrections
-are now different stages of a preconditioner. Since, a Krylov solver is used to
+The successive corrections of the angular multigrid acceleration form
+now different stages of a preconditioner used int the Krylov solver. Since, a Krylov solver is used to
 stabilize the method, two variations are possible :
 \begin{itemize}
 \item the coarsest level can be DSA (ANMG-DSA).
 \item the coarsest level can be P1SA (ANMG-P1SA).
 \end{itemize}
 First, we present the angular multigrid using DSA and then, the angular
-multigrid using P1SA. Later, this two versions are be compared.
+multigrid using P1SA. Later, these two versions are be compared.
 \subsubsection{ANMG-DSA}
 Using a method similar to the one we used to write the equation for the 
-preconditioned Krylov solver, we get
-\hbox{successively :}
+preconditioned Krylov solver, we obtain \hbox{successively :}
 \begin{align}
 & \Phi_n^{(k+1/2)} = D_n L_n^{-1} M_n \Sigma_n \Phi_n^{(k)} + D_n L_n^{-1} Q\\
 & \delta \Phi_{n/2}^{(k)} = D_{n/2} L_{n/2}^{-1} M_{n/2} \Sigma_{n/2}
@@ -307,30 +286,30 @@ with :
 \begin{equation}
 \begin{split}
 b_{MIP}(\phi,\phi^*) =& (\Sigma_a \phi,\phi^*)_{\partial D} +
-\(D\bn\phi,\bn\phi^*\)_{\mathcal{D}} + \(\kappa_e\llb\phi\rrb,\llb\phi^*\rrb\)_{E_h^i}
-+ \(\llb\phi\rrb,\ldb D\partial_n \phi^*\rdb\)_{E_h^i} +\\
-&(\ldb D \partial_n \phi\rdb,\llb\phi^*\rrb)_{E_h^i} + (\kappa_e\phi,\phi^*)_{\partial
-D^d}-\frac{1}{2} \(\phi,D\partial_n \phi^*\)_{\partial
-\mathcal{D}^d} - \frac{1}{2} (D \partial_n \phi,\phi^*)_{\partial \mathcal{D}^d}
+\(\mathrm{D}\bn\phi,\bn\phi^*\)_{\mathcal{D}} + \(\kappa_e\llb\phi\rrb,
+\llb\phi^*\rrb\)_{E_h^i}
++ \(\llb\phi\rrb,\ldb \mathrm{D}\partial_n \phi^*\rdb\)_{E_h^i} +\\
+&(\ldb \mathrm{D} \partial_n \phi\rdb,\llb\phi^*\rrb)_{E_h^i} + 
+(\kappa_e\phi,\phi^*)_{\partial
+D^d}-\frac{1}{2} \(\phi,\mathrm{D}\partial_n \phi^*\)_{\partial
+\mathcal{D}^d} - \frac{1}{2} (\mathrm{D} \partial_n \phi,\phi^*)_{\partial 
+\mathcal{D}^d}
 \end{split}
 \end{equation}
 \begin{equation}
-l_{MIP}(\phi^*) = (Q_0,\phi^*)_{\mathcal{D}} + (J^{inc},\phi^*)_{\partial
-\mathcal{D}^r}
+l_{MIP}(\phi^*) = (Q_0,\phi^*)_{\mathcal{D}} 
 \end{equation}
 where :
 \begin{itemize}
-\item $(f,g)_K = \int_K fg\ d\br$
-\item $(f,g)_e = \int_e fg\ d\bs{s}$
-\item $\(f,g\)_{\mathcal{D}} = \sum_{K\in\mathbb{T}_h} (f,g)_K$
-\item $(f,g)_{E_h^i} = \sum_{e\in E_h^i} (f,g)_e$ 
+\item $(f,g)_{\mathcal{D}} = \sum_{K\in \mathbb{T}_h} \int_K fg\ d\br$ and 
+$(f,g)_{E_h^i} = \sum_{e\in E_h^i} \int_e fg\ ds$
 \item $\mathbb{T}_h$ is the mesh used to discretize the domain $\mathcal{D}$
 into nonoverlapping elements $K$, $E_h^i$ is the set of interior edges,
 $\mathcal{D}$ is the spatial domain, $\partial \mathcal{D}^d$ is the boundary
 of the domain with Dirichlet condition and $\partial \mathcal{D}^r$ is the
 boundary of the domain with reflective condition
 \item $\Sigma_a$ is the absorption macroscopic cross section
-\item $D$ is the diffusion coefficient
+\item $\mathrm{D}$ is the diffusion coefficient
 \item $\partial_n = \bs{n}\cdot \bn$ where $\bs{n}$ is the outward unit
 normal
 \item $\llb \phi\rrb = \phi^{+}-\phi^{-}$ is the jump of at the interface

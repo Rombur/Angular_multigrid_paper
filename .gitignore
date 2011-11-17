@@ -6,3 +6,5 @@
 *.blg
 *.pdf
 plan
+*.txt
+*.npz

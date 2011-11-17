@@ -1,5 +1,5 @@
 \section{Conclusions}
-In this paper, we have recalled the previous works done on angular multigrid
+In this paper, we have recalled the previous work on angular multigrid
 method. For one dimensional geometry, this scheme has been proven to be very 
 efficient compared to DSA. When using Fokker-Planck cross sections, the
 spectral radius of the method is bounded by 0.6 while SI+DSA is bounded by 1. 
@@ -19,11 +19,16 @@ The first sequence was proposed in \cite{multigrid_1d}, the second in
 sequence because it is known to be unstable for multidimensional problem when 
 used with SI. Both sequences were tried using GMRES as Krylov solver and the 
 second one was shown to be more 
-efficient, i.e. the number of GMRES iterations is smaller for highly 
-anisotropic medium and P1SA (PD) is harder to invert than
+efficient, i.e., the number of GMRES iterations is smaller for highly 
+anisotropic medium and P1SA (PD) is more difficult to invert than
 DSA (SPD). The number of GMRES iterations and the time needed
 to solve the equations were compared for sweep preconditioning, DSA
 preconditioning and angular multigrid-DSA preconditioning. The angular
 multigrid was shown to be always faster and needed less iterations than DSA.
 For highly anisotropic scattering, GMRES with angular multigrid
 preconditioning is much faster than GMRES with DSA or sweep preconditioning.
+The comparison of the eigenvalue spectrum of the three methods shows that 
+DSA preconditioner moves the eigenvalues away from zero. The new
+preconditioner moves the eigenvalues further away from zero and keeps them
+closer to each others compare to DSA. This explains the
+efficiency of the angular multigrid method used as a preconditioner.

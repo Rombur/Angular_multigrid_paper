@@ -1,13 +1,17 @@
 \begin{abstract}
-Due to the inefficiency of the Diffusion Synthetic Acceleration (DSA) scheme for
-highly forward-peaked scattering, 1-D and 2-D angular multigrid methods have been developed. 
-The 1-D scheme is unconditionally effective and very efficient but the 2-D
-method can become inefficient when the anisotropy 
-increases too much. This is due to the fact that the scheme needs a filter to be
-stable. In this work, the angular multigrid method has been recast as a
+Standard acceleration technique based on DSA perform poorly when apply to the
+$S_n$ equation for problem with highly forward peak scattering. Angular
+multigrid methods have been developed to accelerate these calculations. 
+The 1-D scheme is unconditionally stable but the extension of the method to
+multidimensional geometries can become unstable when the anisotropy is too
+high. A diffusive filter is needed to stabilize the method which is not as
+efficient that the 1-D scheme. In this work, 
+the angular multigrid method has been recast as a
 preconditioner for a Krylov solver instead of being used as an acceleration
 method for a Source Iteration solver. The Krylov solver stabilizes the method
-which does not require a filter. The new method is shown to be faster and
+and filtering is no longer required. The new method is shown to be faster and
 needs significantly fewer GMRES iterations than DSA preconditioning and sweep
-preconditioning on two test problems.
+preconditioning on two test problems. The eigenvalue spectrum of the three
+methods is compared. The proposed method gathers the eigenvalues and therefore, the
+system requires less GMRES iterations to be solved.
 \end{abstract}

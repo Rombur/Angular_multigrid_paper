@@ -1,48 +1,52 @@
 \section{Introduction}
-Highly anisotropic scattering describes charged-particle scattering. 
-The applications of charged-particle transport are ubiquitous and include radiotherapy, 
-electronics hardening, etc. These particles interact through Coulomb
+Charged-particle transport applications are ubiquitous and include radiotherapy, 
+electronics hardening, etc. Charged particles interact through Coulomb
 interactions. Therefore, each particle undergoes a very large number of
 interactions; each slightly changing the energy and the particle.
-Because of this, the magnitude of the angular moments of the particle flux
-distribution decreases very slowly and, a high number of moments is 
-necessary to solve the problem accurately.\\
-If the scattering ratio is high, it can be difficult to solve the transport
-equation discretized by the discrete ordinate method. To speed up the
-convergence, an acceleration scheme must be used. Standard acceleration schemes 
-like Diffusion Synthetic Acceleration (DSA) focus on accelerating the isotropic 
+Because of this, the scattering is highly forward-peaked. Thus, the magnitude 
+of the angular moments of the particle flux distribution decreases very slowly 
+and, a high number of moments is necessary to solve the problem accurately.\\
+If the scattering ratio $\(c=\frac{\Sigma_{s,0}}{\Sigma_t}\)$ is high, it can be difficult to solve the transport
+equation. To speed up the convergence, acceleration schemes such as Diffusion
+Synthetic Acceleration (DSA) must be used. DSA schemes focus on accelerating
+the weakly anisotropic 
 part of the flux, only the zeroth or the zeroth and the first flux 
 moments are accelerated \cite{adams}. This is very efficient for neutron transport 
-but not for charged-particle transport. The spectral radius of the Source
+but not for charged-particle transport \cite{multigrid_1d}. The spectral radius of the Source
 Iteration (SI) method accelerated by DSA becomes arbitrary close to one when the 
 anisotropy increases and the scattering ratio is close to one. Therefore, other methods have been 
 developed to accelerate higher order flux moments 
-\cite{kassem,multigrid_1d,multigrid_2d}.\\
-Morel an Manteuffel developed in \cite{multigrid_1d} an angular multigrid
-method for the $S_n$ equations in one dimensional geometry. The angular
+\cite{multigrid_1d,multigrid_2d}.\\
+Morel and Manteuffel developed in \cite{multigrid_1d} an angular multigrid
+method for the $S_n$ equations in one dimensional geometry. Their angular
 multigrid method uses a sequence of lower order transport operator and a
-P1 operator to accelerate higher moments. For the scheme to be able to
+$P_1$ operator to accelerate higher moments. For the scheme to be able to
 work, an ``optimal'' transport correction has to be applied to each transport
 operator. This transport correction minimizes the ``high-frequency'' angular
 errors. The results were very encouraging and Pautz et al. generalized this method 
 to multidimensional geometries \cite{multigrid_2d}. This multidimensional
-angular multigrid method needs to be stabilized. They proposed a 
+extension of the original angular multigrid method needs to be stabilized
+because the scheme amplifies the high-frequency error modes
+instead of damping them. They proposed a 
 filter which allows the scheme to be always stable but which also reduces the 
-efficiency of the method compared to the one dimensional case. The spectral 
+efficiency of the method compared to the one dimensional case. However, the spectral 
 radius can now become arbitrary close to one when the anisotropy increases.
-These two schemes used the angular multigrid method as an acceleration scheme
-for SI but this is not the only method to solve the $S_n$ equations. The system 
-of linear equations can also be tackled using non-stationary Krylov solvers, 
-such as GMRES. In \cite{ttg}, the authors 
-summarizes the advantageous features of GMRES as follows : ``using DSA as a 
+The angular multigrid methods proposed so far were only applied in the context
+of SI but the system of linear equations can also be tackled using non-stationary 
+Krylov solvers, such as GMRES. In \cite{ttg}, the authors applied GMRES to
+the single group $S_n$ equations with isotropic scattering and 
+summarizes the advantageous features of GMRES as \hbox{follows :} ``using DSA as a 
 preconditioner for GMRES(m) removes the consistency requirement that plagues 
 DSA-accelerated source iteration in multidimensional problems.'' Driven by this
 property, we propose to use the angular multigrid as a preconditioner for a 
 Krylov solver instead of an acceleration scheme for the Source Iteration
-method. The Krylov solver stabilizes the method and therefore, the filter becomes
+method with application to problems with highly forward-peaked scattering. 
+The Krylov solver does not require the method to have a spectral
+radius below one to be effective and, therefore, the filter used in
+\cite{multigrid_2d} becomes
 unnecessary. A code solving the $S_n$ equations using SI with DSA can easily
 be modified to use preconditioned Krylov solver. The paper is organized as 
 follows; in Section 2, we present the
 notation and the discretized transport equation and we recall the
 previous works done on this topic and the method that we propose. In Section
-3, we show some results and in Section 4, we end with the conclusion.
+3, we show some results and in Section 4, we end with some conclusions.
