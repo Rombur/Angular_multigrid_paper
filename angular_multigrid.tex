@@ -247,9 +247,10 @@ Pautz, Adams, and Morel (PAM) \cite{multigrid_2d} generalized the MM method to
 The instability arose from high-frequency spatial error amplification that
 occurred in the transfer of error estimates between angular grids (a sequence
 of different $S_n$ orders). Stabilization was achieved by filtering the error
-estimates via diffusion operators. However, this filtering was expensive and
+estimates via diffusion operators. However, this filtering 
 significantly degraded the effectiveness of the method such that the spectral
-radius approaches $1$ in the Fokker-Planck limit.
+radius approaches $1$ in the Fokker-Planck limit. Nonetheless, the method was 
+always more efficient than the DSA method for the test problems considered.
 
 The purpose of the present work is to investigate recasting of the PAM method
 with no filtering (PAMNF) as a preconditioner and using it in conjunction with
@@ -300,7 +301,7 @@ preconditioners in the Appendix.
 Charged particles transport can be described by the Boltzmann equation
 \cite{graal}, discretized in energy using the standard multigroup method
 and in angle using the discrete ordinate method ($S_n$)
-\mt{Reuss, really?}\cite{reuss}. For the purpose of this paper, we restrict ourselves to the one-group $S_n$ equation,
+\cite{reuss}. For the purpose of this paper, we restrict ourselves to the one-group $S_n$ equation,
 given below in \eqt{eq:1-g_sn}; however, the techniques described apply straightforwardly to the multigroup equations:
 %
 \begin{equation}
@@ -315,9 +316,9 @@ $\mu_d$ is the cosine of the directional polar angle,
 $\varphi_d$ is the directional azimuthal angle, $\Psi_d$ is
 the angular flux in direction $d$, $Q_d$ is a volumetric source, $\Sigma_{t}(\br)$ is the total 
 macroscopic cross section, $\Sigma_{s,l}$ is the Legendre moment of 
-degree $l$ of the scattering cross section $\Sigma_s$, and $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)A_l^{m}(\bo)\ d\bo
-\approx \sum_{d=1} w_d \Psi(\br,\bo_d,E)Y_l^{m}(\bo_d)$ with  $A_l^m$ the 
-real spherical harmonics.
+degree $l$ of the scattering cross section $\Sigma_s$, and $\Phi_{l,m}(\br,E)= \int_{4\pi}\Psi(\br,\bo,E)Y_l^{m}(\bo)\ d\bo
+\approx \sum_{d=1} w_d \Psi(\br,\bo_d,E)Y_l^{m}(\bo_d)$ with  $Y_l^m$ the 
+spherical harmonics.
 %
 Boundary conditions need to be applied to \eqt{eq:1-g_sn} to close the system; the most
 commonly employed is the incoming flux boundary condition:
@@ -355,7 +356,7 @@ such a manner that $\alpha = \Sigma_s(1-\bar{\mu}_0)$ remains constant.\\
 
 One of key features of angular multigrid method is that transport sweeps
 can strongly damp the high frequency error modes (upper half of the flux moments) with the
-use an ``optimal'' transport correction \cite{multigrid_1d}. 
+use of an ``optimal'' transport correction \cite{multigrid_1d}. 
 This ``optimal'' transport correction is a variant of the
 more known extended transport correction \cite{lathrop,morel_79}. The transport
 correction is a modification of the cross-section moments that changes the effect
@@ -410,7 +411,7 @@ therefore, the discretized scattering term, when a Galerkin quadrature is used, 
 in this paper for highly forward peaked scattering are not restricted to a 
 particular spatial discretization. The results presented here have been obtained 
 using bilinear discontinuous finite elements in two dimensional space \cite{dgfem}.
-Upon space anf angle discretizations, \eqt{eq:1-g_sn} can be re-cast using operator notation as follows:
+Upon space and angle discretizations, \eqt{eq:1-g_sn} can be recast using operator notation as follows:
 %
 \begin{equation}
 L \bs{\Psi} = M\Sigma D \bs{\Psi} + \bs{Q},
@@ -423,7 +424,7 @@ $\Sigma_{s,l}$ values as diagonal entries, $M$ is the moment-to-discrete
 matrix $(\bs{\Psi} = M\bs{\Phi})$, $D$ is the discrete-to-moments matrix
 $(\Phi=D\Psi)$ (the specific spherical moment entries are dictated by (1) the choice of 
 the angular quadrature and (2) the dimensionality of the problem) and 
-$L = \bo\cdot\grad + \Sigma_t$ is the streaming + total interaction operator,
+$L = \bo\cdot\bn + \Sigma_t$ is the streaming + total interaction operator,
 inverted direction by direction (transport sweeps). The inversion can be done
 locally for each mesh cell for each discrete directional flux in the
 quadrature.\\
@@ -451,7 +452,7 @@ scattering ratio $c=\max\(\frac{\Sigma_{s,l}}{\Sigma_t}\)$ is close to one.
 Since most physical forward-peaked scattering produces
 $\Sigma_{s,0}>\Sigma_{s,1}>\hdots$, the flat modes are the ones which should
 be accelerated. The Diffusion Synthetic Acceleration scheme \cite{adams} is
-commonly used to accelerate this flat modes. The SI+DSA scheme is given by
+commonly used to accelerate these flat modes. The SI+DSA scheme is given by
 %
 a transport sweep
 %\begin{subequations}
@@ -640,7 +641,7 @@ solved with a Krylov method is :
 \end{multline}       
 %
 The angular multigrid scheme can also be recast to be used by a Krylov solver. Here, we have chosen
-to re-cast the PAM method without filtering (PAMNF) as a preconditioner for a Krylov solver.
+to recast the PAM method without filtering (PAMNF) as a preconditioner for a Krylov solver.
 The successive corrections of the angular multigrid acceleration form
 now different stages of a preconditioner used in the Krylov solver. Two
 varitions of the PAMNF preconditioner will be tested :
@@ -659,7 +660,7 @@ multigrid using P1SA. Later, these two versions are be compared.
 Using a method similar to the one we used to write the equation for the 
 preconditioned Krylov solver, we recast the PAMNF for Source Iteration as a
 preconditioner for a Krylov solver. First, we write the SI sweep equation, the
-succesive corrections and the new iterate built from the sweep values plus all
+successive corrections and the new iterate built from the sweep values plus all
 the successive \hbox{corrections :}
 \begin{align}
 & \Phi_n^{(k+1/2)} = D_n L_n^{-1} M_n \Sigma_n \Phi_n^{(k)} + D_n L_n^{-1} Q
@@ -674,6 +675,7 @@ R_{n\rightarrow n/2} \(\Phi_n^{(k+1/2)}-\Phi_n^{(k)}\) \label{eq2}\\
 \Phi_{n/2}^{(k)} + \hdots + P_{2 \rightarrow n} \delta \Phi_{2}^{(k)} + P_{0
 \rightarrow n} \delta \Phi_{0}^{(k)}\label{eq4}
 \end{align}
+%a finir dire eq -> eq dans 4
 Now, all the corrections are substituted in equation (\ref{eq4}) :
 \begin{equation}
 \begin{split}
@@ -727,13 +729,15 @@ R_{{n}/{2}\rightarrow {n}/{4}})R_{n\rightarrow{n}/{2}})(I-T_n)
 %
 At this point, it is necessary to choose a DSA scheme for implementation. Among different
 schemes (see \cite{adams}), the Modified Interior Penalty (MIP) DSA was
-chosen \cite{mip}. This DSA scheme is based on a second-order diffusion equation, 
-as opposed to a mixed of $P1$ formulation.
-It uses bilinear discontinuous finite elements, which is
-the same spatial discretization that the one chosen for the
-$S_n$ transport equations. MIP has been shown to be always stable for isotropic
-scattering and is symmetric positive definite (SPD), which makes it easy to invert
-(employing, for instance, a conjugate gradient technique, preconditioned with SSOR).
+chosen \cite{mip}. This DSA scheme is based on a discretization of the diffusion equation 
+rather than the $P1$ equations.  More specifically, MIP uses a bilinear discontinuous trial space, which is
+the same trial space as that used for the $S_n$ transport equations.  However, the MIP equations are not 
+fully consistent with the bilinear-discontinous spatial discretization of the transport equation.  Full 
+consistency requries discretization of the $P1$ equations.  The consistently discretized $P1$ equations are of a 
+non-symmetric mixed form.  The MIP-based DSA algorithm is always stable for isotropic scattering and the MIP 
+diffusion matrix is symmetric positive definite (SPD), which makes it much easier to invert than the mixed P1 DSA 
+equation.  For instance, one can use a conjugate gradient technique, preconditioned with SSOR to solve the MIP 
+matrix equation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ANMG-P1SA}
@@ -755,7 +759,10 @@ T_{n/4}(\hdots(I+P_{1\rightarrow 4}\mathcal{T}_1^{-1} R_{4\rightarrow
 %
 where $\mathcal{T}_1$ is the P1SA operator. 
 The P1SA discretization used in this paper is the P1C method, defined in \cite{yaqi}. 
-This P1SA preconditioner is positive definite (PD).
+This P1SA preconditioner is positive definite (PD), but not symmetric.  In principle, 
+the analytic $P1$ equations can be put in a second-order diffusion form and discretized 
+using the MIP approach.  However, the first moments of the angular flux will be treated with 
+less accuracy than the zeroth moment, which is undesirable.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -777,21 +784,21 @@ $e_j$)
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=9cm]{s8_5_5}
+\includegraphics[width=9cm]{s8_5_5.png}
 \caption{Spectrum of the sweep preconditioned system}
 \label{fig:spectrum_sweep}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=9cm]{d_s8_5_5}
+\includegraphics[width=9cm]{d_s8_5_5.png}
 \caption{Spectrum of the DSA preconditioned system}
 \label{fig:spectrum_DSA}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=9cm]{p_s8_5_5}
+\includegraphics[width=9cm]{p_s8_5_5.png}
 \caption{Spectrum of the Angular Multigrid with DSA preconditioned system}
 \label{fig:spectrum_ANMG}
 \end{figure}
@@ -880,7 +887,7 @@ S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \end{tabular}
 \caption{Number of GMRES iterations to solve the test problem using sweep, DSA
 and ANMG-DSA preconditioning}
-\tbl{tab:2}
+\label{tab:2}
 \end{center}
 \end{table}
 %
@@ -899,7 +906,7 @@ S & DSA & ANMG-DSA & S & DSA & ANMG-DSA & S & DSA & ANMG-DSA\\
 \end{tabular}
 \caption{Elapsed time (s) to solve the test problem using sweep, DSA and
 ANMG-DSA preconditioning}
-\tbl{tab:3}
+\label{tab:3}
 \end{center}
 \end{table}
 It can be noticed that while ANMG-DSA needs the least number of iterations to converge, it is
@@ -961,29 +968,26 @@ multigrid preconditioning over the DSA preconditioning.
 
 In this paper, we have recalled previous work on the angular multigrid
 method (ANMG) applied to the $S_n$ equations for highly forward peaked scattering problems. 
-For one dimensional geometry, this scheme has been proven to be very 
+For 1D geometry, this scheme has been proven to be very 
 efficient compared to DSA preconditioning. When using Fokker-Planck cross sections, the
-spectral radius of the method is bounded by 0.6 while SI+DSA is bounded by 1. 
-For multidimensional problems, the generalization of the ANMG scheme to multi-dimensions (the
-PAMNF and PAMF methods) does not exhibit the same behavior. To remain stable, the angular 
-multigrid method needs to be stabilized
-by a filter which degrades the spectral radius (PAMF method). The spectral radius is smaller 
-to the one from  DSA preconditioning but it can still be arbitrary close to one. 
+spectral radius of the method is bounded by 0.6 while the DSA algorithm is bounded by 1. 
+For multidimensional problems, the generalizations of the ANMG scheme (the
+PAMNF and PAMF methods) do not exhibit the same behavior. To remain stable, the PAMNF angular 
+multigrid method needs to be stabilized by a filter, resulting in the PAMF method, which 
+significantly degrades the spectral radius relative to that of the 1D scheme. Most 
+importantly, the spectral radius is remains smaller than that of DSA, but similarly approaches one 
+in the Fokker-Planck limit. 
 
-Unlike the previous ANMG methods which solved the $S_n$ equations using  Source 
-Iteration, we recast the angular multigrid method as a preconditioner 
-for Krylov solvers. Two variants, which differ at the coarsest angular level,
-have been tested. One uses the sequence $S_n,S_{\lceil\frac{n}{2}\rceil},
-\hdots,S_4,P1SA$, while the other uses the sequence $S_n,
-S_{\lceil\frac{n}{2}\rceil},\hdots,S_2,DSA$.
-The first sequence was proposed in \cite{multigrid_1d}, the second in 
-\cite{multigrid_2d}. In \cite{multigrid_2d}, the authors did not use the first
-sequence because it is known to be unstable for multidimensional problem when 
-solved  using SI. Here, both sequences were solved using GMRES as Krylov solver; 
-both were found to give satisfactory results and the second sequence was shown to be more 
-efficient, i.e., the number of GMRES iterations is smaller for highly 
-anisotropic medium and P1SA (PD) is more difficult to invert than
-DSA (SPD). The number of GMRES iterations and the time needed
+Unlike the previous ANMG methods which solved the $S_n$ equations using Source 
+Iteration, we recast the angular multigrid method as a preconditioner for use with Krylov solvers. 
+Two variants, which differ at the coarsest angular level, have been tested. One uses the sequence 
+$S_n,S_{\lceil\frac{n}{2}\rceil}, \hdots,S_4,P1SA$, while the other uses the sequence $S_n,
+S_{\lceil\frac{n}{2}\rceil},\hdots,S_2,DSA$.  The first sequence was proposed in \cite{multigrid_1d}, 
+the second in \cite{multigrid_2d}. In \cite{multigrid_2d}, the authors did not use the first
+sequence because it is unstable for multidimensional problems. Here, both sequences were solved using 
+GMRES as Krylov solver, and both were found to give satisfactory results.  However, the second sequence 
+was shown to be more efficient because the fully consistent P1SA operator is much more difficult to invert 
+than the DSA. The number of GMRES iterations and the time needed
 to solve the equations were compared for sweep preconditioning, DSA
 preconditioning and angular multigrid-DSA preconditioning. The angular
 multigrid was shown to be always faster and needed fewer iterations than DSA.
